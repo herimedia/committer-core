@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.Charset;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -95,8 +96,13 @@ public class FileSystemCommitter implements ICommitter, IXMLConfigurable {
             File targetFile = createFile(FILE_SUFFIX_ADD);
 
             // Content
-            FileUtils.copyInputStreamToFile(content, 
-                    new File(targetFile.getAbsolutePath() + EXTENSION_CONTENT));
+            FileUtils.write(
+                    new File(targetFile.getAbsolutePath() + EXTENSION_CONTENT),
+                    IOUtils.toString(content, metadata.getString(
+                            "collector.content-encoding",
+                            Charset.defaultCharset().toString())
+                    )
+            );
 
             // Metadata
             FileOutputStream out = new FileOutputStream(new File(
